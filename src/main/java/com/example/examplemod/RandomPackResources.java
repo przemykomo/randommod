@@ -12,15 +12,76 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class RandomPackResources implements PackResources {
 
-    public static final ImmutableSet<String> NAMESPACES = ImmutableSet.of("minecraft");
+    public static final ImmutableSet<String> NAMESPACES = ImmutableSet.of("minecraft", "examplemod");
+
+    private final Map<ResourceLocation, byte[]> resourcesMap = new HashMap<>();
+
+    public RandomPackResources() {
+        String pickaxeMineable = """
+                    {"replace":false,"values":[""" + ExampleMod.generatedBlocks.stream().map(block -> "\"" + ForgeRegistries.BLOCKS.getKey(block).toString() + "\"").collect(Collectors.joining(",")) +
+                "]}";
+        resourcesMap.put(new ResourceLocation("minecraft", "tags/blocks/mineable/pickaxe.json"), pickaxeMineable.getBytes());
+
+        for (ExampleMod.GeneratedEntry generatedEntry : ExampleMod.generatedEntries) {
+            resourcesMap.put(new ResourceLocation("examplemod", "loot_tables/blocks/" + generatedEntry.id() + "_ore.json"),
+                    ("""
+                            {
+                              "type": "minecraft:block",
+                              "pools": [
+                                {
+                                  "bonus_rolls": 0.0,
+                                  "entries": [
+                                    {
+                                      "type": "minecraft:alternatives",
+                                      "children": [
+                                        {
+                                          "type": "minecraft:item",
+                                          "conditions": [
+                                            {
+                                              "condition": "minecraft:match_tool",
+                                              "predicate": {
+                                                "enchantments": [
+                                                  {
+                                                    "enchantment": "minecraft:silk_touch",
+                                                    "levels": {
+                                                      "min": 1
+                                                    }
+                                                  }
+                                                ]
+                                              }
+                                            }
+                                          ],
+                                          "name": "examplemod:""" + generatedEntry.id() + "_ore\"" + """
+                                        },
+                                        {
+                                          "type": "minecraft:item",
+                                          "functions": [
+                                            {
+                                              "enchantment": "minecraft:fortune",
+                                              "formula": "minecraft:ore_drops",
+                                              "function": "minecraft:apply_bonus"
+                                            },
+                                            {
+                                              "function": "minecraft:explosion_decay"
+                                            }
+                                          ],
+                                          "name": "examplemod:""" + generatedEntry.id() + "_raw_ore\"" + """
+                                        }
+                                      ]
+                                    }
+                                  ],
+                                  "rolls": 1.0
+                                }
+                              ]
+                            }""").getBytes());
+        }
+    }
 
     @Nullable
     @Override
@@ -31,14 +92,9 @@ public class RandomPackResources implements PackResources {
 
     @Override
     public InputStream getResource(PackType packType, ResourceLocation resourceLocation) {
-        System.out.println("getResource " + packType.getDirectory() + resourceLocation);
-        if (resourceLocation.getPath().equals("tags/blocks/mineable/pickaxe.json")) {
-            StringBuilder stringBuilder = new StringBuilder("""
-                    {"replace":false,"values":[""");
-            stringBuilder.append(ExampleMod.generatedBlocks.stream().map(block -> "\"" + ForgeRegistries.BLOCKS.getKey(block).toString() + "\"").collect(Collectors.joining(",")));
-//            stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-            stringBuilder.append("]}");
-            return new ByteArrayInputStream(stringBuilder.toString().getBytes());
+        byte[] bytes = resourcesMap.get(resourceLocation);
+        if (bytes != null) {
+            return new ByteArrayInputStream(bytes);
         }
         return InputStream.nullInputStream();
     }
@@ -46,15 +102,24 @@ public class RandomPackResources implements PackResources {
     @Override
     public Collection<ResourceLocation> getResources(PackType packType, String namespace, String directory, Predicate<ResourceLocation> predicate) {
         Set<ResourceLocation> set = new HashSet<>();
-        if (packType == PackType.SERVER_DATA && directory.equals("tags/blocks")) {
-            set.add(new ResourceLocation("minecraft", "tags/blocks/mineable/pickaxe.json"));
+        if (packType == PackType.SERVER_DATA) {
+            if (namespace.equals("minecraft")) {
+                if (directory.equals("tags/blocks")) {
+                    set.add(new ResourceLocation("minecraft", "tags/blocks/mineable/pickaxe.json"));
+                }
+            } else {
+                if (directory.equals("loot_tables") && namespace.equals("examplemod")) {
+                    for (ExampleMod.GeneratedEntry generatedEntry : ExampleMod.generatedEntries) {
+                        set.add(new ResourceLocation("examplemod", "loot_tables/blocks/" + generatedEntry.id() + "_ore.json"));
+                    }
+                }
+            }
         }
         return set;
     }
 
     @Override
     public boolean hasResource(PackType packType, ResourceLocation resourceLocation) {
-//        System.out.println("hasResource " + packType.getDirectory() + resourceLocation);
         return false;
     }
 

@@ -6,7 +6,7 @@ import net.minecraft.server.packs.repository.RepositorySource;
 
 import java.util.function.Consumer;
 
-class RandomRepositorySource implements RepositorySource {
+public class RandomRepositorySource implements RepositorySource {
 
     private final RandomPackResources randomPackResources = new RandomPackResources();
 
