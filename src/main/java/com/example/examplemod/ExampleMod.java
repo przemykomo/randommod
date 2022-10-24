@@ -13,7 +13,6 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.client.event.RegisterColorHandlersEvent;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddPackFindersEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
@@ -38,6 +37,7 @@ public class ExampleMod {
     public static final ArrayList<ColorItem> generatedItems = new ArrayList<>();
     public static final ResourceLocation PICKAXE_MODEL = new ResourceLocation(MODID, "item/pickaxe");
     public static final ResourceLocation RAW_ORE = new ResourceLocation(MODID, "item/raw_ore");
+    public static final ResourceLocation INGOT = new ResourceLocation(MODID, "item/ingot");
     public static final ResourceLocation ORE_TEMPLATE = new ResourceLocation(MODID, "block/ore_template");
 
     public record GeneratedEntry(String id, int color) {}
@@ -92,6 +92,7 @@ public class ExampleMod {
     private void registerModels(ModelEvent.RegisterAdditional event) {
         event.register(PICKAXE_MODEL);
         event.register(RAW_ORE);
+        event.register(INGOT);
         event.register(ORE_TEMPLATE);
     }
 
@@ -143,6 +144,12 @@ public class ExampleMod {
 
                 event.register(ForgeRegistries.Keys.ITEMS, new ResourceLocation(MODID, generatedEntry.id + "_raw_ore"), () -> {
                     ColorItem item = new ColorItem(new Item.Properties().tab(creativeModeTab), generatedEntry.color, RAW_ORE);
+                    generatedItems.add(item);
+                    return item;
+                });
+
+                event.register(ForgeRegistries.Keys.ITEMS, new ResourceLocation(MODID, generatedEntry.id + "_ingot"), () -> {
+                    ColorItem item = new ColorItem(new Item.Properties().tab(creativeModeTab), generatedEntry.color, INGOT);
                     generatedItems.add(item);
                     return item;
                 });

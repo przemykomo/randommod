@@ -29,6 +29,40 @@ public class RandomPackResources implements PackResources {
         resourcesMap.put(new ResourceLocation("minecraft", "tags/blocks/mineable/pickaxe.json"), pickaxeMineable.getBytes());
 
         for (ExampleMod.GeneratedEntry generatedEntry : ExampleMod.generatedEntries) {
+            resourcesMap.put(new ResourceLocation("examplemod", "recipes/" + generatedEntry.id() + "_pickaxe.json"),
+                    ("""
+                            {
+                              "type": "minecraft:crafting_shaped",
+                              "key": {
+                                "#": {
+                                  "item": "minecraft:stick"
+                                },
+                                "X": {
+                                  "item": "examplemod:""" + generatedEntry.id() + "_ingot\"" + """
+                                }
+                              },
+                              "pattern": [
+                                "XXX",
+                                " # ",
+                                " # "
+                              ],
+                              "result": {
+                                "item": "examplemod:""" + generatedEntry.id() + "_pickaxe\"" + """
+                              }
+                            }""").getBytes());
+
+            resourcesMap.put(new ResourceLocation("examplemod", "recipes/" + generatedEntry.id() + "_smelting_raw_ore.json"),
+                    ("""
+                            {
+                              "type": "minecraft:smelting",
+                              "cookingtime": 200,
+                              "experience": 0.7,
+                              "ingredient": {
+                                "item": "examplemod:""" + generatedEntry.id() + "_raw_ore\"" + """
+                              },
+                              "result": "examplemod:""" + generatedEntry.id() + "_ingot\"" + """
+                            }""").getBytes());
+
             resourcesMap.put(new ResourceLocation("examplemod", "loot_tables/blocks/" + generatedEntry.id() + "_ore.json"),
                     ("""
                             {
@@ -107,10 +141,15 @@ public class RandomPackResources implements PackResources {
                 if (directory.equals("tags/blocks")) {
                     set.add(new ResourceLocation("minecraft", "tags/blocks/mineable/pickaxe.json"));
                 }
-            } else {
-                if (directory.equals("loot_tables") && namespace.equals("examplemod")) {
+            } else if (namespace.equals("examplemod")) {
+                if (directory.equals("loot_tables")) {
                     for (ExampleMod.GeneratedEntry generatedEntry : ExampleMod.generatedEntries) {
                         set.add(new ResourceLocation("examplemod", "loot_tables/blocks/" + generatedEntry.id() + "_ore.json"));
+                    }
+                } else if (directory.equals("recipes")) {
+                    for (ExampleMod.GeneratedEntry generatedEntry : ExampleMod.generatedEntries) {
+                        set.add(new ResourceLocation("examplemod", "recipes/" + generatedEntry.id() + "_smelting_raw_ore.json"));
+                        set.add(new ResourceLocation("examplemod", "recipes/" + generatedEntry.id() + "_pickaxe.json"));
                     }
                 }
             }
