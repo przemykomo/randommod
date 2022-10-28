@@ -1,5 +1,6 @@
-package com.example.examplemod;
+package com.example.examplemod.items;
 
+import com.example.examplemod.GeneratedObject;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 

@@ -1,5 +1,6 @@
 package com.example.examplemod;
 
+import com.example.examplemod.items.*;
 import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
@@ -34,8 +35,12 @@ public class ExampleMod {
 
     public static final ArrayList<GeneratedEntry> generatedEntries = new ArrayList<>();
     public static final ArrayList<ColorBlock> generatedBlocks = new ArrayList<>();
-    public static final ArrayList<ColorItem> generatedItems = new ArrayList<>();
+    public static final ArrayList<Item> generatedItems = new ArrayList<>();
     public static final ResourceLocation PICKAXE_MODEL = new ResourceLocation(MODID, "item/pickaxe");
+    public static final ResourceLocation AXE_MODEL = new ResourceLocation(MODID, "item/axe");
+    public static final ResourceLocation SHOVEL_MODEL = new ResourceLocation(MODID, "item/shovel");
+    public static final ResourceLocation SWORD_MODEL = new ResourceLocation(MODID, "item/sword");
+    public static final ResourceLocation HOE_MODEL = new ResourceLocation(MODID, "item/hoe");
     public static final ResourceLocation RAW_ORE = new ResourceLocation(MODID, "item/raw_ore");
     public static final ResourceLocation INGOT = new ResourceLocation(MODID, "item/ingot");
     public static final ResourceLocation ORE_TEMPLATE = new ResourceLocation(MODID, "block/ore_template");
@@ -52,7 +57,7 @@ public class ExampleMod {
         modEventBus.addListener(this::registerBlockColorHandlers);
         modEventBus.addListener(this::addPackFinders);
 
-        Random random = new Random(40);
+        Random random = new Random(20);
         for (int i = 0; i < 10; i++) {
 //            generatedEntries.add(new GeneratedEntry("generated" + i, random.nextInt(0xFFFFFF) << 2 | 0xFF));
             generatedEntries.add(new GeneratedEntry("generated" + i, Color.HSBtoRGB(random.nextFloat(), random.nextFloat(0.5f, 1.0f), random.nextFloat(0.5f, 1.0f))));
@@ -64,13 +69,13 @@ public class ExampleMod {
     }
 
     private void registerItemColorHandlers(RegisterColorHandlersEvent.Item event) {
-        for (ColorItem colorItem : generatedItems) {
+        for (Item colorItem : generatedItems) {
             event.register((itemStack, tintIndex) -> {
                 if (tintIndex != 0) {
                     return -1;
                 }
 
-                return colorItem.color;
+                return ((GeneratedObject) colorItem).getColor();
             }, colorItem);
         }
 
@@ -91,6 +96,10 @@ public class ExampleMod {
 
     private void registerModels(ModelEvent.RegisterAdditional event) {
         event.register(PICKAXE_MODEL);
+        event.register(AXE_MODEL);
+        event.register(SHOVEL_MODEL);
+        event.register(SWORD_MODEL);
+        event.register(HOE_MODEL);
         event.register(RAW_ORE);
         event.register(INGOT);
         event.register(ORE_TEMPLATE);
@@ -100,9 +109,9 @@ public class ExampleMod {
         Map<ResourceLocation, BakedModel> modelRegistry = event.getModels();
         BakedModel bakedOreModel = modelRegistry.get(ORE_TEMPLATE);
 
-        for (ColorItem colorItem : generatedItems) {
+        for (Item colorItem : generatedItems) {
             ModelResourceLocation modelResourceLocation = new ModelResourceLocation(ForgeRegistries.ITEMS.getKey(colorItem), "inventory");
-            modelRegistry.put(modelResourceLocation, modelRegistry.get(colorItem.getModel()));
+            modelRegistry.put(modelResourceLocation, modelRegistry.get(((GeneratedObject) colorItem).getModel()));
         }
 
         for (ColorBlock colorBlock : generatedBlocks) {
@@ -137,7 +146,31 @@ public class ExampleMod {
         if (event.getRegistryKey().equals(ForgeRegistries.Keys.ITEMS)) {
             for (GeneratedEntry generatedEntry : generatedEntries) {
                 event.register(ForgeRegistries.Keys.ITEMS, new ResourceLocation(MODID, generatedEntry.id + "_pickaxe"), () -> {
-                    ColorItem item = new ColorItem(new Item.Properties().tab(creativeModeTab), generatedEntry.color, PICKAXE_MODEL);
+                    ColorPickaxeItem item = new ColorPickaxeItem(Tiers.IRON, 1, -2.8f, new Item.Properties().tab(creativeModeTab), generatedEntry.color);
+                    generatedItems.add(item);
+                    return item;
+                });
+
+                event.register(ForgeRegistries.Keys.ITEMS, new ResourceLocation(MODID, generatedEntry.id + "_axe"), () -> {
+                    ColorAxeItem item = new ColorAxeItem(Tiers.IRON, 6.0f, -3.1f, new Item.Properties().tab(creativeModeTab), generatedEntry.color);
+                    generatedItems.add(item);
+                    return item;
+                });
+
+                event.register(ForgeRegistries.Keys.ITEMS, new ResourceLocation(MODID, generatedEntry.id + "_shovel"), () -> {
+                    ColorShovelItem item = new ColorShovelItem(Tiers.IRON, 1.5f, -3.0f, new Item.Properties().tab(creativeModeTab), generatedEntry.color);
+                    generatedItems.add(item);
+                    return item;
+                });
+
+                event.register(ForgeRegistries.Keys.ITEMS, new ResourceLocation(MODID, generatedEntry.id + "_sword"), () -> {
+                    ColorSwordItem item = new ColorSwordItem(Tiers.IRON, 3, -2.4f, new Item.Properties().tab(creativeModeTab), generatedEntry.color);
+                    generatedItems.add(item);
+                    return item;
+                });
+
+                event.register(ForgeRegistries.Keys.ITEMS, new ResourceLocation(MODID, generatedEntry.id + "_hoe"), () -> {
+                    ColorHoeItem item = new ColorHoeItem(Tiers.IRON, -2, -1.0f, new Item.Properties().tab(creativeModeTab), generatedEntry.color);
                     generatedItems.add(item);
                     return item;
                 });

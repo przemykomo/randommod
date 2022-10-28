@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 public class RandomPackResources implements PackResources {
 
-    public static final ImmutableSet<String> NAMESPACES = ImmutableSet.of("minecraft", "examplemod");
+    public static final ImmutableSet<String> NAMESPACES = ImmutableSet.of("minecraft", ExampleMod.MODID);
 
     private final Map<ResourceLocation, byte[]> resourcesMap = new HashMap<>();
 
@@ -29,7 +29,7 @@ public class RandomPackResources implements PackResources {
         resourcesMap.put(new ResourceLocation("minecraft", "tags/blocks/mineable/pickaxe.json"), pickaxeMineable.getBytes());
 
         for (ExampleMod.GeneratedEntry generatedEntry : ExampleMod.generatedEntries) {
-            resourcesMap.put(new ResourceLocation("examplemod", "recipes/" + generatedEntry.id() + "_pickaxe.json"),
+            resourcesMap.put(new ResourceLocation(ExampleMod.MODID, "recipes/" + generatedEntry.id() + "_pickaxe.json"),
                     ("""
                             {
                               "type": "minecraft:crafting_shaped",
@@ -51,7 +51,95 @@ public class RandomPackResources implements PackResources {
                               }
                             }""").getBytes());
 
-            resourcesMap.put(new ResourceLocation("examplemod", "recipes/" + generatedEntry.id() + "_smelting_raw_ore.json"),
+            resourcesMap.put(new ResourceLocation(ExampleMod.MODID, "recipes/" + generatedEntry.id() + "_axe.json"),
+                    ("""
+                            {
+                              "type": "minecraft:crafting_shaped",
+                              "key": {
+                                "#": {
+                                  "item": "minecraft:stick"
+                                },
+                                "X": {
+                                  "item": "examplemod:""" + generatedEntry.id() + "_ingot\"" + """
+                                }
+                              },
+                              "pattern": [
+                                "XX",
+                                "X#",
+                                " #"
+                              ],
+                              "result": {
+                                "item": "examplemod:""" + generatedEntry.id() + "_axe\"" + """
+                              }
+                            }""").getBytes());
+
+            resourcesMap.put(new ResourceLocation(ExampleMod.MODID, "recipes/" + generatedEntry.id() + "_shovel.json"),
+                    ("""
+                            {
+                              "type": "minecraft:crafting_shaped",
+                              "key": {
+                                "#": {
+                                  "item": "minecraft:stick"
+                                },
+                                "X": {
+                                  "item": "examplemod:""" + generatedEntry.id() + "_ingot\"" + """
+                                }
+                              },
+                              "pattern": [
+                                "X",
+                                "#",
+                                "#"
+                              ],
+                              "result": {
+                                "item": "examplemod:""" + generatedEntry.id() + "_shovel\"" + """
+                              }
+                            }""").getBytes());
+
+            resourcesMap.put(new ResourceLocation(ExampleMod.MODID, "recipes/" + generatedEntry.id() + "_sword.json"),
+                    ("""
+                            {
+                              "type": "minecraft:crafting_shaped",
+                              "key": {
+                                "#": {
+                                  "item": "minecraft:stick"
+                                },
+                                "X": {
+                                  "item": "examplemod:""" + generatedEntry.id() + "_ingot\"" + """
+                                }
+                              },
+                              "pattern": [
+                                "X",
+                                "X",
+                                "#"
+                              ],
+                              "result": {
+                                "item": "examplemod:""" + generatedEntry.id() + "_sword\"" + """
+                              }
+                            }""").getBytes());
+
+            resourcesMap.put(new ResourceLocation(ExampleMod.MODID, "recipes/" + generatedEntry.id() + "_hoe.json"),
+                    ("""
+                            {
+                              "type": "minecraft:crafting_shaped",
+                              "key": {
+                                "#": {
+                                  "item": "minecraft:stick"
+                                },
+                                "X": {
+                                  "item": "examplemod:""" + generatedEntry.id() + "_ingot\"" + """
+                                }
+                              },
+                              "pattern": [
+                                "XX",
+                                " #",
+                                " #"
+                              ],
+                              "result": {
+                                "item": "examplemod:""" + generatedEntry.id() + "_hoe\"" + """
+                              }
+                            }""").getBytes());
+
+            resourcesMap.put(new ResourceLocation(ExampleMod.MODID, "recipes/" + generatedEntry.id() + "_smelting_raw_ore.json"),
                     ("""
                             {
                               "type": "minecraft:smelting",
@@ -63,7 +151,7 @@ public class RandomPackResources implements PackResources {
                               "result": "examplemod:""" + generatedEntry.id() + "_ingot\"" + """
                             }""").getBytes());
 
-            resourcesMap.put(new ResourceLocation("examplemod", "loot_tables/blocks/" + generatedEntry.id() + "_ore.json"),
+            resourcesMap.put(new ResourceLocation(ExampleMod.MODID, "loot_tables/blocks/" + generatedEntry.id() + "_ore.json"),
                     ("""
                             {
                               "type": "minecraft:block",
@@ -141,15 +229,19 @@ public class RandomPackResources implements PackResources {
                 if (directory.equals("tags/blocks")) {
                     set.add(new ResourceLocation("minecraft", "tags/blocks/mineable/pickaxe.json"));
                 }
-            } else if (namespace.equals("examplemod")) {
+            } else if (namespace.equals(ExampleMod.MODID)) {
                 if (directory.equals("loot_tables")) {
                     for (ExampleMod.GeneratedEntry generatedEntry : ExampleMod.generatedEntries) {
-                        set.add(new ResourceLocation("examplemod", "loot_tables/blocks/" + generatedEntry.id() + "_ore.json"));
+                        set.add(new ResourceLocation(ExampleMod.MODID, "loot_tables/blocks/" + generatedEntry.id() + "_ore.json"));
                     }
                 } else if (directory.equals("recipes")) {
                     for (ExampleMod.GeneratedEntry generatedEntry : ExampleMod.generatedEntries) {
-                        set.add(new ResourceLocation("examplemod", "recipes/" + generatedEntry.id() + "_smelting_raw_ore.json"));
-                        set.add(new ResourceLocation("examplemod", "recipes/" + generatedEntry.id() + "_pickaxe.json"));
+                        set.add(new ResourceLocation(ExampleMod.MODID, "recipes/" + generatedEntry.id() + "_smelting_raw_ore.json"));
+                        set.add(new ResourceLocation(ExampleMod.MODID, "recipes/" + generatedEntry.id() + "_pickaxe.json"));
+                        set.add(new ResourceLocation(ExampleMod.MODID, "recipes/" + generatedEntry.id() + "_axe.json"));
+                        set.add(new ResourceLocation(ExampleMod.MODID, "recipes/" + generatedEntry.id() + "_shovel.json"));
+                        set.add(new ResourceLocation(ExampleMod.MODID, "recipes/" + generatedEntry.id() + "_sword.json"));
+                        set.add(new ResourceLocation(ExampleMod.MODID, "recipes/" + generatedEntry.id() + "_hoe.json"));
                     }
                 }
             }
